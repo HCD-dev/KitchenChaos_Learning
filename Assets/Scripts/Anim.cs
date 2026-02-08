@@ -1,11 +1,8 @@
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 
 public class Anim : MonoBehaviour
 {
     private const string IS_WALKING = "IsWalking";
-    [SerializeField] private Player player; // Player script'ine referans
     private Animator animator;
 
     void Start()
@@ -15,23 +12,27 @@ public class Anim : MonoBehaviour
         if (animator == null)
         {
             Debug.LogError("Animator bileþeni bulunamadý!");
+            return;
+        }
+
+        // Player.Instance'ý kullanarak event'e abone ol
+        if (Player.Instance != null)
+        {
+            // Ýsteðe baðlý: Player'ýn seçilen counter deðiþtiðinde animasyonu güncelle
         }
     }
 
     void Update()
     {
-        if (player == null)
+        if (animator == null)
         {
-            Debug.LogError("Player referansý atanmadý!");
             return;
         }
 
-        if (animator == null)
+        // Player.Instance'ý doðrudan kullan
+        if (Player.Instance != null)
         {
-            return; // Animator yoksa devam etmeyin
+            animator.SetBool(IS_WALKING, Player.Instance.IsWalking());
         }
-
-        animator.SetBool(IS_WALKING, player.IsWalking());
     }
 }
-
