@@ -35,6 +35,4 @@ public interface IKitchenObjectParent
     /// Parent objesinin GameObject referansýný döndürür.
     /// (Interface'te .gameObject eriþimi için kritik!)
     /// </summary>
-    GameObject GetGameObject();
-    void Interact(Player player);
 }

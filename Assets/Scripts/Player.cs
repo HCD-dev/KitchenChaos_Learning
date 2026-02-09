@@ -10,7 +10,7 @@ using System;
 /// Singleton pattern kullanarak global erişim sağlar.
 /// Counter seçimini trackler ve event sistemi ile diğer sistemlere bildirir.
 /// </summary>
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IKitchenObjectParent
 {
     // ========== SİNGLETON PATTERN ==========
     // Oyunun herhangi bir yerinden Player.Instance ile erişim sağlayan static property
@@ -20,7 +20,7 @@ public class Player : MonoBehaviour
     // Counter seçimi değiştiğinde tetiklenen event
     // Diğer sistemler (UI, Visual) bu event'i dinleyerek kendilerini güncelleyebilir
     public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged;
-    
+
     /// <summary>
     /// OnSelectedCounterChanged event'i ile geçirilen veri.
     /// Seçilen counter'ı içerir.
@@ -33,30 +33,36 @@ public class Player : MonoBehaviour
     // ========== İNCELEYİCİ AYARLARI ==========
     // Oyuncunun hareket hızı (birim/saniye)
     [SerializeField] private float moveSpeed = 7f;
-    
+
     // Oyuncunun dönme hızı (başa çevirmesi ne kadar hızlı)
     [SerializeField] private float rotationSpeed = 10f;
-    
+
     // Input sistemi referansı (Keyboard input okumak için)
     [SerializeField] private GameInput gameInput;
-    
-    // Counter'ları seçebilmek için gerekli layer mask
-    // (Raycast sadece bu layerdeki objeleri algılar)
-    [SerializeField] private LayerMask counterLayerMask;
+
+
 
     // ========== ETKILEŞIM AYARLARI ==========
     // Counter'a etkileşim yapılabilecek maksimum mesafe (birim cinsinden)
     // Bu sayede çok uzaktaki counter'lar seçilemiyor
     [SerializeField] private float interactionDistance = 2f;
-    
+
     // Raycast'ın bir counter'ı seçebilmesi için oyuncuya ne kadar yakın olması gerekir
     // (Yarıçap - counter'ın tespit edilebilir alanı)
     [SerializeField] private float detectionRadius = 0.5f;
 
+    // Counter'ları seçebilmek için gerekli layer mask
+    // (Raycast sadece bu layerdeki objeleri algılar)
+    [SerializeField] private LayerMask counterLayerMask;
+
+    //neden
+    [SerializeField] private Transform KitchenObjectHoldPoint;
+
+
     // ========== HAREKET İÇİN FLAGLAR ==========
     // Oyuncu şu anda hareket ediyor mu? (Animasyon için kullanılır)
     public bool isWalking;
-    
+
     // Etkileşim için son geçerli yön (oyuncu hareket ederken kaydedilir)
     // Bu yön T tuşu ile test amacında kullanılır
     private Vector3 lastInteractDir;
@@ -64,11 +70,16 @@ public class Player : MonoBehaviour
     // ========== COUNTER SEÇİMİ ==========
     // Şu anda seçili olan counter referansı (null = seçili yok)
     private ClearCounter selectedCounter;
+    private KitchenObject kitchenObject;
+
 
     /// <summary>
     /// Game başladığında bir kez çalışır.
     /// Singleton ayarlanır ve başlatma kontrolleri yapılır.
     /// </summary>
+
+
+
     public void Awake()
     {
         // Eğer zaten bir Player instance'ı varsa, yeni olanı oluşturmayı engelleyin
@@ -77,10 +88,10 @@ public class Player : MonoBehaviour
         {
             Debug.LogError("Birden fazla Player instance'ı var!");
         }
-        
+
         // Bu instance'ı global singleton yapın
         Instance = this;
-    }   
+    }
 
     /// <summary>
     /// Game başladığında Awake'den sonra çalışır.
@@ -103,10 +114,10 @@ public class Player : MonoBehaviour
         if (selectedCounter != null)
         {
             // Counter'ın Interact metodunu çağırarak etkileşime gir
-            selectedCounter.Interact();
+            selectedCounter.Interact(this);
         }
         // Eğer seçili counter yoksa hiçbir şey yapmaz
-    }
+    }   
 
     /// <summary>
     /// Her frame'de oyuncu input'unu işler.
@@ -116,7 +127,7 @@ public class Player : MonoBehaviour
     {
         // Hareket inputlarını oku ve oyuncuyu hareket ettir
         HandleMovement();
-        
+
         // Counter seçimini kontrol et (raycast ile)
         HandleInteraction();
     }
@@ -262,11 +273,11 @@ public class Player : MonoBehaviour
             // Counter oyuncunun arkasında mı? (90 derece kural)
             // direction = counter'a doğru yön
             Vector3 directionToCounter = (counter.transform.position - transform.position).normalized;
-            
+
             // Dot product: 0.7 = ~45 derece açı (rahatlık için)
             // 1.0 = Tam önde, 0 = 90 derece, -1 = Tam arkada
             float angleAlignment = Vector3.Dot(transform.forward, directionToCounter);
-            
+
             // Eğer counter oyuncunun arkasında 45 dereceden fazla ise yoksay
             if (angleAlignment < 0.7f)
             {
@@ -326,4 +337,27 @@ public class Player : MonoBehaviour
         // Event tetikleme
         OnSelectedCounterChanged?.Invoke(this, new OnSelectedCounterChangedEventArgs { selectedCounter = counter });
     }
+    public Transform GetKitchenObjectFollowTransform()
+    {
+        return KitchenObjectHoldPoint;
+    }
+    public void SetKitchenObject(KitchenObject kitchenObject)
+    {
+        this.kitchenObject = kitchenObject;
+
+    }
+    public KitchenObject GetKitchenObject()
+    {
+        return kitchenObject;
+    }
+    public void ClearKitchenObject()
+    {
+        kitchenObject = null;
+    }      
+
+     public bool HasKitchenObject()
+    {
+                return kitchenObject != null;
+    }
 }
+

@@ -25,46 +25,40 @@ public class KitchenObject : MonoBehaviour
     public void SetClearCounter(ClearCounter newCounter)
     {
         // 🔑 ADIM 1: Eski counter'dan kendimizi çıkar
-        // Örnek: Counter A'daydım, Counter B'ye gidiyorum → Önce A'yı temizle
         if (clearCounter != null)
         {
-            clearCounter.ClearKitchenObject(); // Bu çağrı ClearCounter.kitchenObject = null yapar!
+            clearCounter.ClearKitchenObject();
         }
 
         // 🔑 ADIM 2: Yeni counter'a geçiş yap
         if (newCounter != null)
         {
-            // Hedef counter dolu mu? (Counter B'de zaten nesne var mı?)
+            // Hedef counter dolu mu?
             if (newCounter.HasKitchenObject())
             {
                 KitchenObject existingObject = newCounter.GetKitchenObject();
 
-                // Mevcut nesne biz değilsek imha et (kendini imha etme riskini önle)
                 if (existingObject != null && existingObject != this)
                 {
-                    // Önce mevcut nesnenin counter'ını temizle (referans tutarsızlığını önle)
                     if (existingObject.clearCounter != null)
                     {
                         existingObject.clearCounter.ClearKitchenObject();
                     }
-
-                    // Sonra nesneyi imha et
                     Destroy(existingObject.gameObject);
                 }
             }
 
-            // 🔑 ADIM 3: Yeni counter'ı ata ve transform'u güncelle
-            clearCounter = newCounter;                          // Nesne artık bu counter'a ait
-            newCounter.SetKitchenObject(this);                  // Counter da bu nesneyi tanısın
+            clearCounter = newCounter;
+            newCounter.SetKitchenObject(this);
 
-            transform.parent = newCounter.GetKitchenObjectFollowTransform(); // Counter'ın child'ı yap
-            transform.localPosition = Vector3.zero;             // Counter'ın merkezine hizala
+            transform.parent = newCounter.GetKitchenObjectFollowTransform();
+            transform.localPosition = Vector3.zero;
         }
         else
         {
-            // 🔑 ADIM 4: Counter null ise (oyuncu eline aldıysa)
+            // 🔑 ADIM 3: Counter null ise (oyuncu eline aldıysa)
             clearCounter = null;
-            transform.parent = null; // Dünya hiyerarşisine çıkar
+            // Transform parent ayarlama burada YAPMAYıN - Player.Interact'te ayarlanacak
         }
     }
 
@@ -72,4 +66,4 @@ public class KitchenObject : MonoBehaviour
     /// Bu nesnenin bağlı olduğu counter'ı döndürür.
     /// </summary>
     public ClearCounter GetClearCounter() => clearCounter;
-}
+}   

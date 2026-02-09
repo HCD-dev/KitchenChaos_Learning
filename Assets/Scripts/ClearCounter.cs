@@ -17,7 +17,7 @@ public class ClearCounter : MonoBehaviour, IKitchenObjectParent
 
     // Inspector'da işaretlenecek: Test modunu aktif/pasif yapar
     [SerializeField] private bool testing;
-
+                        
     // Bu counter'da şu anda bulunan mutfak nesnesi (null = boş counter)
     private KitchenObject kitchenObject;
 
@@ -84,6 +84,7 @@ public class ClearCounter : MonoBehaviour, IKitchenObjectParent
         }
         else
         {
+            //kitchenObject.SetClearCounter(player);
             // Counter doluysa mevcut nesnenin ismini göster
             //kitchenObject.SetClearCounter(player);
             Debug.Log($"Counter'da mevcut nesne: {kitchenObject.GetKitchenObjectSO().name}");
@@ -92,9 +93,53 @@ public class ClearCounter : MonoBehaviour, IKitchenObjectParent
 
     public void Interact(Player player)
     {
-        // Burada oyuncu ile counter etkileşimini tanımlayabilirsiniz.
-        // Şimdilik mevcut Interact() metodunu çağırıyoruz.
-        Interact();
+        if (kitchenObject == null)
+        {
+            // Counter boşsa
+            if (player.HasKitchenObject())
+            {
+                // Player'daki nesneyi bu counter'a koy
+                KitchenObject playerObject = player.GetKitchenObject();
+                player.ClearKitchenObject(); // Player'ın referansını temizle
+                playerObject.SetClearCounter(this);
+            }
+            else
+            {
+                // Player'da nesne yok ve counter'da da yok
+                // Yeni nesne oluştur
+                if (kitchenObjectSO == null)
+                {
+                    Debug.LogError("kitchenObjectSO Inspector'da atanmamış!");
+                    return;
+                }
+                
+                Transform kitchenObjectTransform = Instantiate(kitchenObjectSO.prefab, CounterTopPoint);
+                kitchenObjectTransform.localPosition = Vector3.zero;
+                
+                KitchenObject newKitchenObject = kitchenObjectTransform.GetComponent<KitchenObject>();
+                newKitchenObject.SetClearCounter(this);
+            }
+        }
+        else
+        {
+            // Counter doluysa
+            // Eğer player'da zaten nesne varsa hiçbir şey yapma
+            if (player.HasKitchenObject())
+            {
+                Debug.LogWarning("Player'da zaten nesne var! Bırakmalısın başka counter'a.");
+                return;
+            }
+            
+            // Counter'daki nesneyi player'a ver
+            KitchenObject objectToGive = kitchenObject; // Referansı kopyala
+            objectToGive.SetClearCounter(null);
+            
+            // Transform'u player'ın hold point'ine ayarla
+            objectToGive.transform.parent = player.GetKitchenObjectFollowTransform();
+            objectToGive.transform.localPosition = Vector3.zero;
+            
+            player.SetKitchenObject(objectToGive);
+        }
     }
 
     /// <summary>
