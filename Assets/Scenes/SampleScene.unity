@@ -119,6 +119,17 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!114 &41364514 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5077826448042684501, guid: d5e4e0103f009f7429a0ca2a6a8f6bee, type: 3}
+  m_PrefabInstance: {fileID: 2959115722183516946}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ae0b6826a2d8f14da37ad2e62f1ffb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ClearCounter
 --- !u!1 &44651046
 GameObject:
   m_ObjectHideFlags: 0
@@ -239,6 +250,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5077826448042684501, guid: d5e4e0103f009f7429a0ca2a6a8f6bee, type: 3}
+      propertyPath: tomatoPrefab
+      value: 
+      objectReference: {fileID: 4946250073940812365, guid: 1daceb72329134a46a19371a2af741c7, type: 3}
+    - target: {fileID: 5077826448042684501, guid: d5e4e0103f009f7429a0ca2a6a8f6bee, type: 3}
+      propertyPath: kitchenObjectSO
+      value: 
+      objectReference: {fileID: 11400000, guid: 9dc0db410e52fe443ba5149cbf9be28a, type: 2}
+    - target: {fileID: 5077826448042684501, guid: d5e4e0103f009f7429a0ca2a6a8f6bee, type: 3}
+      propertyPath: secondClearCounter
+      value: 
+      objectReference: {fileID: 41364514}
     - target: {fileID: 6978883103411915534, guid: d5e4e0103f009f7429a0ca2a6a8f6bee, type: 3}
       propertyPath: m_LocalPosition.x
       value: -1.4906615
@@ -887,7 +910,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d535b1d5d3235e4ebcb2812f54dfaf4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Anim
-  player: {fileID: 1608918545}
+--- !u!114 &2067736744 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5077826448042684501, guid: d5e4e0103f009f7429a0ca2a6a8f6bee, type: 3}
+  m_PrefabInstance: {fileID: 64059933}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ae0b6826a2d8f14da37ad2e62f1ffb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ClearCounter
 --- !u!1001 &2959115722183516946
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -896,6 +929,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5077826448042684501, guid: d5e4e0103f009f7429a0ca2a6a8f6bee, type: 3}
+      propertyPath: secondClearCounter
+      value: 
+      objectReference: {fileID: 2067736744}
     - target: {fileID: 6978883103411915534, guid: d5e4e0103f009f7429a0ca2a6a8f6bee, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
