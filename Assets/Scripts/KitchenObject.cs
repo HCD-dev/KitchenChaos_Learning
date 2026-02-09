@@ -10,7 +10,7 @@ public class KitchenObject : MonoBehaviour
     [SerializeField] private KitchenObjectSO kitchenObjectSO;
 
     // Bu nesnenin şu anda bağlı olduğu counter (null = elde taşınıyor)
-    private ClearCounter clearCounter;
+    internal ClearCounter clearCounter;
 
     /// <summary>
     /// Nesnenin ScriptableObject verisini döndürür (UI'da göstermek için).
@@ -43,10 +43,9 @@ public class KitchenObject : MonoBehaviour
                 if (existingObject != null && existingObject != this)
                 {
                     // Önce mevcut nesnenin counter'ını temizle (referans tutarsızlığını önle)
-                    ClearCounter oldCounter = existingObject.clearCounter;
-                    if (oldCounter != null)
+                    if (existingObject.clearCounter != null)
                     {
-                        oldCounter.ClearKitchenObject();
+                        existingObject.clearCounter.ClearKitchenObject();
                     }
 
                     // Sonra nesneyi imha et

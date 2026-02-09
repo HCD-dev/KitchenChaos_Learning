@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using System;
 
 
@@ -60,25 +59,15 @@ public class Player : MonoBehaviour
         return isWalking;
     }
     private void HandleInteraction()
-    {        // Raycast yönü normalize et - bu kritik!
-        Vector3 rayDirection = lastInteractDir.normalized;
-
-        // Eðer yön sýfýrsa raycast yapma
-        if (rayDirection == Vector3.zero)
-        {
-       
-            return;
-        }
+    {
+        // Raycast yönü - oyuncunun BAKTAÐI yön (transform.forward)
+        Vector3 rayDirection = transform.forward;
 
         float interactionDistance = 2f;
         if (Physics.Raycast(transform.position, rayDirection, out RaycastHit raycastHit, interactionDistance, counterLayerMask))
         {
-            
-
             if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))
             {
-                
-
                 if (clearCounter != selectedCounter)
                 {
                     SetSelectedCounter(clearCounter);
@@ -93,7 +82,6 @@ public class Player : MonoBehaviour
         {
             SetSelectedCounter(null);
         }
-        
     }
 
     private void HandleMovement()

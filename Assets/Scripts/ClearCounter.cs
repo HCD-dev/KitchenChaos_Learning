@@ -4,7 +4,7 @@
 /// Mutfak tezgahını (counter) temsil eder. Oyuncu ile etkileşime girerek
 /// mutfak nesneleri oluşturabilir, taşıyabilir veya mevcut nesneyi inceleyebilir.
 /// </summary>
-public class ClearCounter : MonoBehaviour
+public class ClearCounter : MonoBehaviour, IKitchenObjectParent
 {
     // Inspector'da atanacak: Bu counter'a eklenecek nesnenin ScriptableObject verisi
     [SerializeField] private KitchenObjectSO kitchenObjectSO;
@@ -85,8 +85,16 @@ public class ClearCounter : MonoBehaviour
         else
         {
             // Counter doluysa mevcut nesnenin ismini göster
+            //kitchenObject.SetClearCounter(player);
             Debug.Log($"Counter'da mevcut nesne: {kitchenObject.GetKitchenObjectSO().name}");
         }
+    }
+
+    public void Interact(Player player)
+    {
+        // Burada oyuncu ile counter etkileşimini tanımlayabilirsiniz.
+        // Şimdilik mevcut Interact() metodunu çağırıyoruz.
+        Interact();
     }
 
     /// <summary>
@@ -114,4 +122,9 @@ public class ClearCounter : MonoBehaviour
     /// Counter'da nesne olup olmadığını kontrol eder.
     /// </summary>
     public bool HasKitchenObject() => kitchenObject != null;
+
+    /// <summary>
+    /// Bu counter'ın GameObject'ini döndürür.
+    /// </summary>
+    public GameObject GetGameObject() => gameObject;
 }
