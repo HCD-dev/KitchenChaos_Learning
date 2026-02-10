@@ -64,6 +64,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         }
 
         gameInput.OnInteractAction += GameInput_OnInteractAction;
+         gameInput.OnInteractAlternateAction += GameInput_OnInteractAlternateAction;
     }
 
     private void GameInput_OnInteractAction(object sender, System.EventArgs e)
@@ -74,6 +75,18 @@ public class Player : MonoBehaviour, IKitchenObjectParent
             if (selectedCounter is BaseCounter baseCounter)
             {
                 baseCounter.Interact(this);
+            }
+        }
+    }
+
+    private void GameInput_OnInteractAlternateAction(object sender, System.EventArgs e)
+    {
+        if (selectedCounter != null)
+        {
+            // IKitchenObjectParent BaseCounter türüne cast edebiliriz
+            if (selectedCounter is BaseCounter baseCounter)
+            {
+                baseCounter.InteractAlternate(this);
             }
         }
     }
@@ -247,6 +260,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         if (gameInput != null)
         {
             gameInput.OnInteractAction -= GameInput_OnInteractAction;
+            gameInput.OnInteractAlternateAction -= GameInput_OnInteractAlternateAction;
         }
     }
 }

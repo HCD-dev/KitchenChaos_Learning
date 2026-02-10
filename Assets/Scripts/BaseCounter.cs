@@ -32,7 +32,7 @@ public abstract class BaseCounter : MonoBehaviour, IKitchenObjectParent
     // ========== ORTAK INTERACT METODU ==========
     public virtual void Interact()
     {
-        // Bu    metod artýk kullanýlmýyor, alt sýnýflar override edecek
+        // Bu metod artýk kullanýlmýyor, alt sýnýflar override edecek
         Debug.LogWarning("Interact() metodunu override etmelisiniz!");
     }
 
@@ -69,4 +69,10 @@ public abstract class BaseCounter : MonoBehaviour, IKitchenObjectParent
             player.SetKitchenObject(objectToGive);
         }
     }
-}
+
+    public virtual void InteractAlternate(Player player)
+    {
+        // Alternatif etkileþim - alt sýnýflar (CuttingCounter, vb.) override edecek
+        Debug.LogWarning("InteractAlternate() metodunu override etmelisiniz!");
+    }
+    }

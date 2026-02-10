@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 /// <summary>
 /// Mutfak nesnesini (bıçak, tabak, malzeme vb.) temsil eder.
@@ -66,4 +67,10 @@ public class KitchenObject : MonoBehaviour
     /// Bu nesnenin bağlı olduğu parent'ı döndürür.
     /// </summary>
     public IKitchenObjectParent GetClearCounter() => kitchenObjectParent;
+
+    internal void DestorySelf()
+    {
+        kitchenObjectParent.ClearKitchenObject();
+        Destroy(gameObject);
+    }
 }   

@@ -9,6 +9,8 @@ public class GameInput : MonoBehaviour
     // E tuþuna basýldýðýnda tetiklenen event
     // Player sýnýfý bu event'e abone olur ve Counter ile etkileþime girer
             public event EventHandler OnInteractAction;
+            public event EventHandler OnInteractAlternateAction;
+    
 
     // ========== INPUT SYSTEM REFERANSI ==========
     // Unity's new Input System'den otomatik üretilen input action sýnýfý
@@ -22,16 +24,16 @@ public class GameInput : MonoBehaviour
     private void Awake()
     {
         // Input System sýnýfýný oluþtur
-        // (PlayerInputAction.inputactions dosyasýndan auto-generate edilmiþtir)
         PlayerInputActions = new PlayerInputAction();
-        
+
         // Player input action map'ini etkinleþtir
-        // Böylece WASD, Ok tuþlarý, E tuþu takip edilmeye baþlar
         PlayerInputActions.Player.Enable();
-        
-        // E tuþuna basýldýðýnda ("Interact" action'ý performed olduðunda)
-        // Interact_performed metodunu çaðýrýlmasýný saðla
+
+        // E tuþu callback'i
         PlayerInputActions.Player.Interact.performed += Interact_performed;
+
+        // F tuþu callback'i (InteractAlternate)
+        PlayerInputActions.Player.InteractAlternate.performed += InteractAlternate_performed;
     }
 
     /// <summary>
@@ -46,8 +48,14 @@ public class GameInput : MonoBehaviour
         OnInteractAction?.Invoke(this, EventArgs.Empty);
     }
 
+    private void InteractAlternate_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        // Alternatif etkileþim event'ini tetikle
+        OnInteractAlternateAction?.Invoke(this, EventArgs.Empty);
+    }
+
     /// <summary>
-    /// WASD veya Ok tuþlarýndan hareket vektörü okur.
+    /// WASD veya Ok tuþlarýndan hareket ve             ktörü okur.
     /// Sonucu normalize eder (magnitude = 1 veya 0).
     /// </summary>
     /// <returns>
@@ -67,5 +75,18 @@ public class GameInput : MonoBehaviour
         
         // Normalize edilmiþ vektörü döndür
         return inputVector;
+    }
+
+    /// <summary>
+    /// Input System kapalý kaldýðýnda event'i temizle
+    /// </summary>
+    private void OnDestroy()
+    {
+        if (PlayerInputActions != null)
+        {
+            PlayerInputActions.Player.Interact.performed -= Interact_performed;
+            PlayerInputActions.Player.InteractAlternate.performed -= InteractAlternate_performed;
+            PlayerInputActions.Player.Disable();
+        }
     }
 }
