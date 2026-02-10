@@ -9,8 +9,8 @@ public class KitchenObject : MonoBehaviour
     // Inspector'da atanacak: Bu nesneye ait veri (isim, sprite, vb.)
     [SerializeField] private KitchenObjectSO kitchenObjectSO;
 
-    // Bu nesnenin şu anda bağlı olduğu counter (null = elde taşınıyor)
-    internal ClearCounter clearCounter;
+    // Bu nesnenin şu anda bağlı olduğu parent (counter, player vb.) - null = counter'da değil
+    internal IKitchenObjectParent kitchenObjectParent;
 
     /// <summary>
     /// Nesnenin ScriptableObject verisini döndürür (UI'da göstermek için).
@@ -18,52 +18,52 @@ public class KitchenObject : MonoBehaviour
     public KitchenObjectSO GetKitchenObjectSO() => kitchenObjectSO;
 
     /// <summary>
-    /// Bu nesneyi yeni bir counter'a taşır.
-    /// Eski counter'ı temizler, hedef counter'daki mevcut nesneyi imha eder.
+    /// Bu nesneyi yeni bir parent'a taşır (Counter veya Player).
+    /// Eski parent'ı temizler, hedef parent'taki mevcut nesneyi imha eder.
     /// </summary>
-    /// <param name="newCounter">Taşınacak hedef counter (null = counter'dan çıkar)</param>
-    public void SetClearCounter(ClearCounter newCounter)
+    /// <param name="newParent">Taşınacak hedef parent (null = parent'dan çıkar)</param>
+    public void SetClearCounter(IKitchenObjectParent newParent)
     {
-        // 🔑 ADIM 1: Eski counter'dan kendimizi çıkar
-        if (clearCounter != null)
+        // 🔑 ADIM 1: Eski parent'dan kendimizi çıkar
+        if (kitchenObjectParent != null)
         {
-            clearCounter.ClearKitchenObject();
+            kitchenObjectParent.ClearKitchenObject();
         }
 
-        // 🔑 ADIM 2: Yeni counter'a geçiş yap
-        if (newCounter != null)
+        // 🔑 ADIM 2: Yeni parent'a geçiş yap
+        if (newParent != null)
         {
-            // Hedef counter dolu mu?
-            if (newCounter.HasKitchenObject())
+            // Hedef parent dolu mu?
+            if (newParent.HasKitchenObject())
             {
-                KitchenObject existingObject = newCounter.GetKitchenObject();
+                KitchenObject existingObject = newParent.GetKitchenObject();
 
                 if (existingObject != null && existingObject != this)
                 {
-                    if (existingObject.clearCounter != null)
+                    if (existingObject.kitchenObjectParent != null)
                     {
-                        existingObject.clearCounter.ClearKitchenObject();
+                        existingObject.kitchenObjectParent.ClearKitchenObject();
                     }
                     Destroy(existingObject.gameObject);
                 }
             }
 
-            clearCounter = newCounter;
-            newCounter.SetKitchenObject(this);
+            kitchenObjectParent = newParent;
+            newParent.SetKitchenObject(this);
 
-            transform.parent = newCounter.GetKitchenObjectFollowTransform();
+            transform.parent = newParent.GetKitchenObjectFollowTransform();
             transform.localPosition = Vector3.zero;
         }
         else
         {
-            // 🔑 ADIM 3: Counter null ise (oyuncu eline aldıysa)
-            clearCounter = null;
+            // 🔑 ADIM 3: Parent null ise (oyuncu eline aldıysa)
+            kitchenObjectParent = null;
             // Transform parent ayarlama burada YAPMAYıN - Player.Interact'te ayarlanacak
         }
     }
 
     /// <summary>
-    /// Bu nesnenin bağlı olduğu counter'ı döndürür.
+    /// Bu nesnenin bağlı olduğu parent'ı döndürür.
     /// </summary>
-    public ClearCounter GetClearCounter() => clearCounter;
+    public IKitchenObjectParent GetClearCounter() => kitchenObjectParent;
 }   

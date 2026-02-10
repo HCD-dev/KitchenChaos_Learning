@@ -1,9 +1,7 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 using System;
-
-
 
 /// <summary>
 /// Oyuncunun hareket, rotasyon ve etkileşim kontrollerini yönetir.
@@ -12,130 +10,80 @@ using System;
 /// </summary>
 public class Player : MonoBehaviour, IKitchenObjectParent
 {
+    // ========== CONSTANTS ==========
+    private const float PLAYER_RADIUS = 0.7f;
+    private const float PLAYER_HEIGHT = 2f;
+    private const float FORWARD_CHECK_THRESHOLD = 0.7f; // ~45 derece
+    private const float MOVEMENT_THRESHOLD = 0.5f;
+
     // ========== SİNGLETON PATTERN ==========
-    // Oyunun herhangi bir yerinden Player.Instance ile erişim sağlayan static property
     public static Player Instance { get; private set; }
 
     // ========== EVENTLER ==========
-    // Counter seçimi değiştiğinde tetiklenen event
-    // Diğer sistemler (UI, Visual) bu event'i dinleyerek kendilerini güncelleyebilir
     public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged;
 
-    /// <summary>
-    /// OnSelectedCounterChanged event'i ile geçirilen veri.
-    /// Seçilen counter'ı içerir.
-    /// </summary>
     public class OnSelectedCounterChangedEventArgs : EventArgs
     {
-        public ClearCounter selectedCounter; // Yeni seçili counter (null ise hiçbiri seçili değil)
+        public IKitchenObjectParent selectedCounter;
     }
 
     // ========== İNCELEYİCİ AYARLARI ==========
-    // Oyuncunun hareket hızı (birim/saniye)
     [SerializeField] private float moveSpeed = 7f;
-
-    // Oyuncunun dönme hızı (başa çevirmesi ne kadar hızlı)
-    [SerializeField] private float rotationSpeed = 10f;
-
-    // Input sistemi referansı (Keyboard input okumak için)
+    [SerializeField] private float rotationSpeed = 10f;     
     [SerializeField] private GameInput gameInput;
-
-
-
-    // ========== ETKILEŞIM AYARLARI ==========
-    // Counter'a etkileşim yapılabilecek maksimum mesafe (birim cinsinden)
-    // Bu sayede çok uzaktaki counter'lar seçilemiyor
     [SerializeField] private float interactionDistance = 2f;
-
-    // Raycast'ın bir counter'ı seçebilmesi için oyuncuya ne kadar yakın olması gerekir
-    // (Yarıçap - counter'ın tespit edilebilir alanı)
     [SerializeField] private float detectionRadius = 0.5f;
-
-    // Counter'ları seçebilmek için gerekli layer mask
-    // (Raycast sadece bu layerdeki objeleri algılar)
     [SerializeField] private LayerMask counterLayerMask;
-
-    //neden
     [SerializeField] private Transform KitchenObjectHoldPoint;
 
-
-    // ========== HAREKET İÇİN FLAGLAR ==========
-    // Oyuncu şu anda hareket ediyor mu? (Animasyon için kullanılır)
+    // ========== PRIVATE FIELDS ==========
     public bool isWalking;
-
-    // Etkileşim için son geçerli yön (oyuncu hareket ederken kaydedilir)
-    // Bu yön T tuşu ile test amacında kullanılır
     private Vector3 lastInteractDir;
-
-    // ========== COUNTER SEÇİMİ ==========
-    // Şu anda seçili olan counter referansı (null = seçili yok)
-    private ClearCounter selectedCounter;
+    private IKitchenObjectParent selectedCounter;
     private KitchenObject kitchenObject;
-
-
-    /// <summary>
-    /// Game başladığında bir kez çalışır.
-    /// Singleton ayarlanır ve başlatma kontrolleri yapılır.
-    /// </summary>
-
-
 
     public void Awake()
     {
-        // Eğer zaten bir Player instance'ı varsa, yeni olanı oluşturmayı engelleyin
-        // (Sahne değiştiğinde yanlışlıkla çift Player oluşmasını önler)
-        if (Instance != null)
+        // Singleton kontrolü iyileştirildi
+        if (Instance != null && Instance != this)
         {
-            Debug.LogError("Birden fazla Player instance'ı var!");
+            Debug.LogError("Birden fazla Player instance'ı var! Yeni instance yok ediliyor.");
+            Destroy(gameObject);
+            return;
         }
-
-        // Bu instance'ı global singleton yapın
         Instance = this;
     }
 
-    /// <summary>
-    /// Game başladığında Awake'den sonra çalışır.
-    /// Event listener'ları kurulur.
-    /// </summary>
     void Start()
     {
-        // Oyuncu E tuşuna bastığında çağrılacak fonksiyonu kaydedin
-        // Böylece GameInput sınıfı E tuşuna basıldığını algıladığında bunu bilir
+        // Null check eklendi
+        if (gameInput == null)
+        {
+            Debug.LogError("GameInput referansı atanmamış!");
+            return;
+        }
+
         gameInput.OnInteractAction += GameInput_OnInteractAction;
     }
 
-    /// <summary>
-    /// E tuşuna basıldığında tetiklenen event handler.
-    /// Seçili counter varsa onunla etkileşim kurar.
-    /// </summary>
     private void GameInput_OnInteractAction(object sender, System.EventArgs e)
     {
-        // Eğer seçili bir counter varsa (raycast tarafından bulundu)
         if (selectedCounter != null)
         {
-            // Counter'ın Interact metodunu çağırarak etkileşime gir
-            selectedCounter.Interact(this);
+            // IKitchenObjectParent BaseCounter türüne cast edebiliriz
+            if (selectedCounter is BaseCounter baseCounter)
+            {
+                baseCounter.Interact(this);
+            }
         }
-        // Eğer seçili counter yoksa hiçbir şey yapmaz
-    }   
+    }
 
-    /// <summary>
-    /// Her frame'de oyuncu input'unu işler.
-    /// Hareket ve etkileşim kontrolleri yapılır.
-    /// </summary>
     void Update()
     {
-        // Hareket inputlarını oku ve oyuncuyu hareket ettir
         HandleMovement();
-
-        // Counter seçimini kontrol et (raycast ile)
         HandleInteraction();
     }
 
-    /// <summary>
-    /// Oyuncunun şu anda yürüyüp yürümediğini döndürür.
-    /// Animasyon sistemi tarafından kullanılır (walking animation trigger'ı için).
-    /// </summary>
     public bool IsWalking()
     {
         return isWalking;
@@ -144,43 +92,50 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     private void HandleMovement()
     {
         Vector2 inputVector = gameInput.GetMovementVectorNormalized();
-
         Vector3 moveDir = new Vector3(inputVector.x, 0f, inputVector.y);
 
         float moveDistance = moveSpeed * Time.deltaTime;
-        float playerRadius = .7f;
-        float playerHeight = 2f;
-        bool canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDir, moveDistance);
+        bool canMove = !Physics.CapsuleCast(
+            transform.position,
+            transform.position + Vector3.up * PLAYER_HEIGHT,
+            PLAYER_RADIUS,
+            moveDir,
+            moveDistance
+        );
 
         if (!canMove)
         {
-            // Cannot move towards moveDir
-
-            // Attempt only X movement
+            // X ekseni hareketi dene
             Vector3 moveDirX = new Vector3(moveDir.x, 0, 0).normalized;
-            canMove = (moveDir.x < -.5f || moveDir.x > +.5f) && !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirX, moveDistance);
+            canMove = (Mathf.Abs(moveDir.x) > MOVEMENT_THRESHOLD) &&
+                     !Physics.CapsuleCast(
+                         transform.position,
+                         transform.position + Vector3.up * PLAYER_HEIGHT,
+                         PLAYER_RADIUS,
+                         moveDirX,
+                         moveDistance
+                     );
 
             if (canMove)
             {
-                // Can move only on the X
                 moveDir = moveDirX;
             }
             else
             {
-                // Cannot move only on the X
-
-                // Attempt only Z movement
+                // Z ekseni hareketi dene
                 Vector3 moveDirZ = new Vector3(0, 0, moveDir.z).normalized;
-                canMove = (moveDir.z < -.5f || moveDir.z > +.5f) && !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirZ, moveDistance);
+                canMove = (Mathf.Abs(moveDir.z) > MOVEMENT_THRESHOLD) &&
+                         !Physics.CapsuleCast(
+                             transform.position,
+                             transform.position + Vector3.up * PLAYER_HEIGHT,
+                             PLAYER_RADIUS,
+                             moveDirZ,
+                             moveDistance
+                         );
 
                 if (canMove)
                 {
-                    // Can move only on the Z
                     moveDir = moveDirZ;
-                }
-                else
-                {
-                    // Cannot move in any direction
                 }
             }
         }
@@ -192,99 +147,46 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
         isWalking = moveDir != Vector3.zero;
 
-        float rotateSpeed = 10f;
-        transform.forward = Vector3.Slerp(transform.forward, moveDir, Time.deltaTime * rotateSpeed);
+        if (moveDir != Vector3.zero)
+        {
+            transform.forward = Vector3.Slerp(transform.forward, moveDir, Time.deltaTime * rotationSpeed);
+        }
     }
 
-
-    /// <summary>
-    /// Üç farklı yöntem karşılaştırması:
-    /// 
-    /// 1. RAYCAST (MEVCUT - Sorunlu):
-    ///    - Sadece en yakın objeyi bulur
-    ///    - Dar açı - yakındaki counter'lar seçilmeyebilir
-    ///    - Hızlı ama sınırlı
-    /// 
-    /// 2. OVERLAPSPHEREAALL (ÖNERİLEN - SEÇILMIŞ):
-    ///    - Belirli yarıçapta TÜM counter'ları bulur
-    ///    - Sonra en yakınını seçer
-    ///    - Doğru ve esnek - forward check yapılır
-    /// 
-    /// 3. BOX/CAPSULE CAST:
-    ///    - Daha karmaşık hesaplamalar
-    ///    - Büyük oyunlar için optimize edilmiş
-    /// </summary>
     private void HandleInteraction()
     {
-        // ========== YÖNTEM 1: RAYCAST (ESKI - SORUNLU) ==========
-        // Vector3 rayDirection = transform.forward;
-        // if (Physics.Raycast(transform.position, rayDirection, out RaycastHit raycastHit, interactionDistance, counterLayerMask))
-        // {
-        //     if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))
-        //     {
-        //         if (clearCounter != selectedCounter)
-        //         {
-        //             SetSelectedCounter(clearCounter);
-        //         }
-        //     }
-        //     else
-        //     {
-        //         SetSelectedCounter(null);
-        //     }
-        // }
-        // else
-        // {
-        //     SetSelectedCounter(null);
-        // }
-
-        // ========== YÖNTEM 2: OVERLAPSPHEREAALL + FORWARD CHECK (ÖNERİLEN) ==========
-        // Oyuncunun konumunda belirli yarıçapta TÜM collider'ları bul
-        // QueryTriggerInteraction.Ignore = trigger collider'ları dahil etme
         Collider[] collidersInRange = Physics.OverlapSphere(
-            transform.position,                          // Oyuncunun konumu merkezdir
-            interactionDistance,                         // 2 birim içinde ara
-            counterLayerMask,                            // Sadece Counter layer'ı ara
-            QueryTriggerInteraction.Ignore               // Trigger olmayan collider'lar
+            transform.position,
+            interactionDistance,
+            counterLayerMask,
+            QueryTriggerInteraction.Ignore
         );
 
-        // Eğer hiç counter bulunamadıysa, seçimi temizle
         if (collidersInRange.Length == 0)
         {
             SetSelectedCounter(null);
             return;
         }
 
-        // En yakın counter'ı bul
-        ClearCounter closestCounter = null;
+        IKitchenObjectParent closestCounter = null;
         float closestDistance = float.MaxValue;
 
         foreach (Collider collider in collidersInRange)
         {
-            // Bu collider'dan ClearCounter bileşeni al
-            if (!collider.TryGetComponent<ClearCounter>(out ClearCounter counter))
-            {
-                continue; // Bu obje ClearCounter'sa değil, atla
-            }
+            // Hem ClearCounter hem ContainerCounter'ı al
+            if (!collider.TryGetComponent<IKitchenObjectParent>(out IKitchenObjectParent counter))
+                continue;
 
-            // Counter'a kadar olan mesafeyi hesapla
-            float distanceToCounter = Vector3.Distance(transform.position, counter.transform.position);
-
-            // Ayrıca OYUNCU BAKTAĞI YÖNE KONTROL ET
-            // Counter oyuncunun arkasında mı? (90 derece kural)
-            // direction = counter'a doğru yön
-            Vector3 directionToCounter = (counter.transform.position - transform.position).normalized;
-
-            // Dot product: 0.7 = ~45 derece açı (rahatlık için)
-            // 1.0 = Tam önde, 0 = 90 derece, -1 = Tam arkada
+            // IKitchenObjectParent'tan GameObject'e erişmek için
+            GameObject counterGameObject = collider.gameObject;
+            
+            float distanceToCounter = Vector3.Distance(transform.position, counterGameObject.transform.position);
+            Vector3 directionToCounter = (counterGameObject.transform.position - transform.position).normalized;
             float angleAlignment = Vector3.Dot(transform.forward, directionToCounter);
 
-            // Eğer counter oyuncunun arkasında 45 dereceden fazla ise yoksay
-            if (angleAlignment < 0.7f)
-            {
-                continue; // Bu counter oyuncunun "önünde" değil, atla
-            }
+            if (angleAlignment < FORWARD_CHECK_THRESHOLD)
+                continue;
 
-            // En yakın olanı bul
             if (distanceToCounter < closestDistance)
             {
                 closestDistance = distanceToCounter;
@@ -292,72 +194,59 @@ public class Player : MonoBehaviour, IKitchenObjectParent
             }
         }
 
-        // En yakın counter'ı seçin (ya da null)
         if (closestCounter != selectedCounter)
         {
             SetSelectedCounter(closestCounter);
         }
     }
 
-    // ========== ALTERNATIF: BOXCAST YÖNTEMİ (İleri Seviye) ==========
-    // Bu metod daha karmaşık ama daha hassas kontrol sağlar
-    // private void HandleInteraction_BoxCastMethod()
-    // {
-    //     // Oyuncunun önünde bir "kutu" ile çarpışma kontrolü yap
-    //     Vector3 boxSize = new Vector3(1f, 2f, 2f); // Genişlik, Yükseklik, Derinlik
-    //     
-    //     // Physics.BoxCastAll ile TÜM counter'ları bul
-    //     RaycastHit[] hits = Physics.BoxCastAll(
-    //         center: transform.position,
-    //         halfExtents: boxSize / 2,
-    //         direction: transform.forward,
-    //         distance: interactionDistance,
-    //         layerMask: counterLayerMask
-    //     );
-    //     
-    //     // En yakınını seç...
-    // }
-
-    // ========== DEBUG VİZÜEL (Scene'de görüntülemek için) ==========
-    // Update metodunda çağırıp görsel hatayı düzeltebilirsin
     private void OnDrawGizmosSelected()
     {
-        // Etkileşim alanını visualize et (scene view'da)
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, interactionDistance);
 
-        // Oyuncunun baktığı yönü göster
         Gizmos.color = Color.blue;
         Gizmos.DrawLine(transform.position, transform.position + transform.forward * interactionDistance);
     }
 
-    private void SetSelectedCounter(ClearCounter counter)
+    private void SetSelectedCounter(IKitchenObjectParent counter)
     {
         selectedCounter = counter;
-        // Event tetikleme
         OnSelectedCounterChanged?.Invoke(this, new OnSelectedCounterChangedEventArgs { selectedCounter = counter });
     }
+
+    // ========== IKitchenObjectParent Implementation ==========
     public Transform GetKitchenObjectFollowTransform()
     {
         return KitchenObjectHoldPoint;
     }
+
     public void SetKitchenObject(KitchenObject kitchenObject)
     {
         this.kitchenObject = kitchenObject;
-
     }
+
     public KitchenObject GetKitchenObject()
     {
         return kitchenObject;
     }
+
     public void ClearKitchenObject()
     {
         kitchenObject = null;
-    }      
+    }
 
-     public bool HasKitchenObject()
+    public bool HasKitchenObject()
     {
-                return kitchenObject != null;
+        return kitchenObject != null;
+    }
+
+    // ========== CLEANUP ==========
+    private void OnDestroy()
+    {
+        if (gameInput != null)
+        {
+            gameInput.OnInteractAction -= GameInput_OnInteractAction;
+        }
     }
 }
-
