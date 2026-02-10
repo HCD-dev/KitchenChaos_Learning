@@ -32,23 +32,8 @@ public abstract class BaseCounter : MonoBehaviour, IKitchenObjectParent
     // ========== ORTAK INTERACT METODU ==========
     public virtual void Interact()
     {
-        // KitchenObjectSO atanmamýþsa hata ver ve çýk
-        if (kitchenObjectSO == null)
-        {
-            Debug.LogError("kitchenObjectSO Inspector'da atanmamýþ! Counter'ý ayarla.");
-            return;
-        }
-
-        // Counter boþsa yeni nesne oluþtur
-        if (kitchenObject == null)
-        {
-            CreateKitchenObject();
-        }
-        else
-        {
-            // Counter doluysa mevcut nesnenin ismini göster
-            Debug.Log($"Counter'da mevcut nesne: {kitchenObject.GetKitchenObjectSO().name}");
-        }
+        // Bu    metod artýk kullanýlmýyor, alt sýnýflar override edecek
+        Debug.LogWarning("Interact() metodunu override etmelisiniz!");
     }
 
     public virtual void Interact(Player player)
@@ -63,17 +48,7 @@ public abstract class BaseCounter : MonoBehaviour, IKitchenObjectParent
                 player.ClearKitchenObject();
                 playerObject.SetClearCounter(this);
             }
-            else
-            {
-                // Player'da nesne yok ve counter'da da yok - Yeni nesne oluþtur
-                if (kitchenObjectSO == null)
-                {
-                    Debug.LogError("kitchenObjectSO Inspector'da atanmamýþ!");
-                    return;
-                }
-
-                CreateKitchenObject();
-            }
+            // Player'da nesne yok ve counter'da da yok - Yeni nesne oluþturma!
         }
         else
         {
@@ -93,18 +68,5 @@ public abstract class BaseCounter : MonoBehaviour, IKitchenObjectParent
 
             player.SetKitchenObject(objectToGive);
         }
-    }
-
-    // ========== PROTECTED YARDIMCI METODLAR ==========
-    /// <summary>
-    /// Mutfak nesnesi oluþturur ve counter'a atar.
-    /// </summary>
-    protected virtual void CreateKitchenObject()
-    {
-        Transform kitchenObjectTransform = Instantiate(kitchenObjectSO.prefab, CounterTopPoint);
-        kitchenObjectTransform.localPosition = Vector3.zero;
-
-        KitchenObject newKitchenObject = kitchenObjectTransform.GetComponent<KitchenObject>();
-        newKitchenObject.SetClearCounter(this);
     }
 }
