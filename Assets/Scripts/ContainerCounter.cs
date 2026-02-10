@@ -38,30 +38,14 @@ public class ContainerCounter : BaseCounter
             // Animasyonu çal
             OnPlayerInteract?.Invoke(this, EventArgs.Empty);
 
-            // Yeni nesne oluþtur (CounterTopPoint'te deðil, doðrudan player'ýn eline alýnacak)
-            Transform kitchenObjectTransform = Instantiate(kitchenObjectSO.prefab);
-            
-            KitchenObject newKitchenObject = kitchenObjectTransform.GetComponent<KitchenObject>();
-            
-            // Player'ýn hold point'ine ayarla (CounterTopPoint'te deðil)
-            newKitchenObject.transform.parent = player.GetKitchenObjectFollowTransform();
-            newKitchenObject.transform.localPosition = Vector3.zero;
-            
-            // Player'a ver
-            newKitchenObject.SetClearCounter(player);
-            player.SetKitchenObject(newKitchenObject);
+            // Yeni nesneyi oluþtur ve player'a ver
+            KitchenObject.SpawnKitchenObject(kitchenObjectSO, player);
         }
         else
         {
             // Counter'da nesne varsa (bu durumda olmamasý gerekir, ama güvenlik için)
             // Counter'daki nesneyi player'a ver (varsa)
-            KitchenObject objectToGive = kitchenObject;
-            objectToGive.SetClearCounter(player);
-
-            objectToGive.transform.parent = player.GetKitchenObjectFollowTransform();
-            objectToGive.transform.localPosition = Vector3.zero;
-
-            player.SetKitchenObject(objectToGive);
+            GetKitchenObject().SetClearCounter(player);
         }
     }
 }

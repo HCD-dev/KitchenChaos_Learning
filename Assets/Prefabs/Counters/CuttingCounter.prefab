@@ -103,7 +103,10 @@ MonoBehaviour:
   kitchenObjectSO: {fileID: 0}
   CounterTopPoint: {fileID: 309806088764588683}
   cuttingProgressMax: 3
-  cutKitchenObjectSO: {fileID: 11400000, guid: 7d79699dfc9766e41b5319852f374b65, type: 2}
+  cuttingRecipeSOArray:
+  - {fileID: 11400000, guid: 48c095f10721aa445b8ead27817cc4a0, type: 2}
+  - {fileID: 11400000, guid: efb1fbaecd986744397ac6c6f0bffa50, type: 2}
+  - {fileID: 11400000, guid: 43f402a0753245e4f9b5b36b19e01b58, type: 2}
 --- !u!1001 &4021826822462017180
 PrefabInstance:
   m_ObjectHideFlags: 0

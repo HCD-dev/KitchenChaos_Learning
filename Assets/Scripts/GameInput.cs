@@ -84,9 +84,18 @@ public class GameInput : MonoBehaviour
     {
         if (PlayerInputActions != null)
         {
+            // Önce callback'leri kaldýr
             PlayerInputActions.Player.Interact.performed -= Interact_performed;
             PlayerInputActions.Player.InteractAlternate.performed -= InteractAlternate_performed;
+            
+            // Sonra Disable() çaðýr
             PlayerInputActions.Player.Disable();
+            
+            // Son olarak Dispose() çaðýr
+            PlayerInputActions.Dispose();
+            
+            // Null yap
+            PlayerInputActions = null;
         }
     }
 }

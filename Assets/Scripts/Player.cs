@@ -69,25 +69,31 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     private void GameInput_OnInteractAction(object sender, System.EventArgs e)
     {
-        if (selectedCounter != null)
-        {
-            // IKitchenObjectParent BaseCounter türüne cast edebiliriz
-            if (selectedCounter is BaseCounter baseCounter)
-            {
-                baseCounter.Interact(this);
-            }
-        }
+        HandleCounterInteraction((counter) => counter.Interact(this));
     }
 
     private void GameInput_OnInteractAlternateAction(object sender, System.EventArgs e)
+    {
+        HandleCounterInteraction((counter) => counter.InteractAlternate(this));
+    }
+
+    private void HandleCounterInteraction(System.Action<BaseCounter> interactionAction)
     {
         if (selectedCounter != null)
         {
             // IKitchenObjectParent BaseCounter türüne cast edebiliriz
             if (selectedCounter is BaseCounter baseCounter)
             {
-                baseCounter.InteractAlternate(this);
+                interactionAction(baseCounter);
             }
+            else
+            {
+                Debug.LogWarning("selectedCounter BaseCounter türü değil!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("selectedCounter null! Counter aralığında değilsiniz.");
         }
     }
 

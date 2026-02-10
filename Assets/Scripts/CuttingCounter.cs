@@ -5,7 +5,7 @@ public class CuttingCounter : BaseCounter
 {
     // ========== ÝNCELEYÝCÝ AYARLARI ==========
     [SerializeField] private int cuttingProgressMax = 3;
-    [SerializeField] private KitchenObjectSO cutKitchenObjectSO;
+    [SerializeField] private CuttingRecipeSO[] cuttingRecipeSOArray;
 
 
 
@@ -56,13 +56,39 @@ public class CuttingCounter : BaseCounter
 
     public override void InteractAlternate(Player player)
     {
-        if (HasKitchenObject())
+        if (!HasKitchenObject())
         {
-            // Tezgah dolu, mutfak objesi var, onu kes
-            GetKitchenObject().DestorySelf();
-            Transform kitchenObjectTransform = Instantiate(cutKitchenObjectSO.prefab);
-            kitchenObjectTransform.GetComponent<KitchenObject>().SetClearCounter(this);
-
+            // Tezgah boþsa hiçbir þey yapma
+            return;
         }
+
+        // Kesme iþlemini arttýr
+       
+        OnCuttingProgressChanged?.Invoke(this, new OnCuttingProgressChangedEventArgs { cuttingProgress = cuttingProgress });
+
+        // Kesme tamamlandý mý?
+             KitchenObjectSO cutKitchenObjectSO = GetOutputForInput(GetKitchenObject().GetKitchenObjectSO());
+
+        // Eski nesneyi yok et
+        GetKitchenObject().DestorySelf();
+            
+            // Yeni kesilmiþ nesneyi oluþtur ve counter'a koy
+            
+            KitchenObject.SpawnKitchenObject(cutKitchenObjectSO, this);
+            
+
+            // Kesme iþlemini sýfýrla
+           
+    }
+    private KitchenObjectSO GetOutputForInput(KitchenObjectSO inputKitchenObjectSO)
+    {
+        foreach (CuttingRecipeSO cuttingRecipeSO in cuttingRecipeSOArray)
+        {
+            if (cuttingRecipeSO.input == inputKitchenObjectSO)
+            {
+                return cuttingRecipeSO.output;
+            }
+        }
+        return null;
     }
 }
