@@ -1,11 +1,13 @@
 using UnityEngine;
 using System;
-    
+using System.Runtime.InteropServices.WindowsRuntime;
+
 public class CuttingCounter : BaseCounter
 {
     // ========== ÝNCELEYÝCÝ AYARLARI ==========
     [SerializeField] private int cuttingProgressMax = 3;
     [SerializeField] private CuttingRecipeSO[] cuttingRecipeSOArray;
+  
 
 
 
@@ -33,7 +35,12 @@ public class CuttingCounter : BaseCounter
             if(player.HasKitchenObject())
             {
                 // Oyuncunun elinde mutfak objesi var, onu tezgaha koy
-                player.GetKitchenObject().SetClearCounter(this);
+                if (HasRecipeWithInput(player.GetKitchenObject().GetKitchenObjectSO()))
+                {
+                    // Oyuncunun elindeki mutfak objesi kesme tariflerinden biriyle eþleþiyor, tezgaha koy  
+                    player.GetKitchenObject().SetClearCounter(this);
+
+                }
             }
             else
             {
@@ -53,40 +60,53 @@ public class CuttingCounter : BaseCounter
             }
         }
     }
+   
 
     public override void InteractAlternate(Player player)
     {
-        if (!HasKitchenObject())
+        if (HasKitchenObject() && HasRecipeWithInput(GetKitchenObject().GetKitchenObjectSO()))
         {
-            // Tezgah boþsa hiçbir þey yapma
-            return;
+            cuttingProgress++;
+
+            KitchenObjectSO inputKitchenObjectSO = GetKitchenObject().GetKitchenObjectSO();
+            CuttingRecipeSO cuttingRecipeSO = GetCuttingRecipeSOWithInput(inputKitchenObjectSO);
+            
+            if (cuttingProgress >= cuttingRecipeSO.cuttingProgressMax)
+            {
+                KitchenObjectSO cutKitchenObjectSO = GetOutputForInput(inputKitchenObjectSO);
+                GetKitchenObject().DestorySelf();
+                KitchenObject.SpawnKitchenObject(cutKitchenObjectSO, this);
+                
+               
+                cuttingProgress = 0;
+            }
         }
-
-        // Kesme iþlemini arttýr
-       
-        OnCuttingProgressChanged?.Invoke(this, new OnCuttingProgressChangedEventArgs { cuttingProgress = cuttingProgress });
-
-        // Kesme tamamlandý mý?
-             KitchenObjectSO cutKitchenObjectSO = GetOutputForInput(GetKitchenObject().GetKitchenObjectSO());
-
-        // Eski nesneyi yok et
-        GetKitchenObject().DestorySelf();
-            
-            // Yeni kesilmiþ nesneyi oluþtur ve counter'a koy
-            
-            KitchenObject.SpawnKitchenObject(cutKitchenObjectSO, this);
-            
-
-            // Kesme iþlemini sýfýrla
-           
+        
+    }
+    private bool HasRecipeWithInput(KitchenObjectSO inputKitchenObjectSO)
+    {
+        CuttingRecipeSO cuttingRecipeSO = GetCuttingRecipeSOWithInput(inputKitchenObjectSO);
+        return cuttingRecipeSO != null;
     }
     private KitchenObjectSO GetOutputForInput(KitchenObjectSO inputKitchenObjectSO)
+    {
+
+        CuttingRecipeSO cuttingRecipeSO = GetCuttingRecipeSOWithInput(inputKitchenObjectSO);
+        if (cuttingRecipeSO != null)
+        {
+            return cuttingRecipeSO.output;
+        }else { 
+            return null;
+        }
+       
+    }
+    private CuttingRecipeSO GetCuttingRecipeSOWithInput(KitchenObjectSO inputKitchenObjectSO)
     {
         foreach (CuttingRecipeSO cuttingRecipeSO in cuttingRecipeSOArray)
         {
             if (cuttingRecipeSO.input == inputKitchenObjectSO)
             {
-                return cuttingRecipeSO.output;
+                return cuttingRecipeSO;
             }
         }
         return null;
