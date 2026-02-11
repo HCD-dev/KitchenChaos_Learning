@@ -1,23 +1,19 @@
 using UnityEngine;
 using System;
-using System.Runtime.InteropServices.WindowsRuntime;
+
 
 public class CuttingCounter : BaseCounter
 {
-    // ========== ÝNCELEYÝCÝ AYARLARI ==========
-    [SerializeField] private int cuttingProgressMax = 3;
-    [SerializeField] private CuttingRecipeSO[] cuttingRecipeSOArray;
-  
 
-
-
-    // ========== EVENTLER ==========
-    public event EventHandler<OnCuttingProgressChangedEventArgs> OnCuttingProgressChanged;
-
-    public class OnCuttingProgressChangedEventArgs : EventArgs
+    public event EventHandler<OnProgressChangedEventArgs> OnProgressChanged;
+    public class OnProgressChangedEventArgs : EventArgs
     {
-        public int cuttingProgress;
+        public float progressNormalized;
     }
+    public event EventHandler Oncut;
+
+    // ========== ÝNCELEYÝCÝ AYARLARI ==========
+    [SerializeField] private CuttingRecipeSO[] cuttingRecipeSOArray;
 
     // ========== PRIVATE FIELDS ==========
     private int cuttingProgress;
@@ -25,26 +21,47 @@ public class CuttingCounter : BaseCounter
     private void Start()
     {
         cuttingProgress = 0;
+        
+        // Null check
+        if (cuttingRecipeSOArray == null || cuttingRecipeSOArray.Length == 0)
+        {
+            Debug.LogError($"CuttingCounter: cuttingRecipeSOArray Inspector'da atanmamýþ veya boþ!", gameObject);
+        }
     }
 
     public override void Interact(Player player)
     {
         if(!HasKitchenObject())
         {
-            // Tezgah boþ, mutfak objesi yok
             if(player.HasKitchenObject())
             {
-                // Oyuncunun elinde mutfak objesi var, onu tezgaha koy
-                if (HasRecipeWithInput(player.GetKitchenObject().GetKitchenObjectSO()))
+                KitchenObject playerKitchenObject = player.GetKitchenObject();
+                
+                // Null check
+                if (playerKitchenObject == null)
                 {
-                    // Oyuncunun elindeki mutfak objesi kesme tariflerinden biriyle eþleþiyor, tezgaha koy  
-                    player.GetKitchenObject().SetClearCounter(this);
-
+                    Debug.LogWarning("CuttingCounter: Player'ýn KitchenObject'i null!", gameObject);
+                    return;
                 }
-            }
-            else
-            {
-                // Oyuncunun elinde mutfak objesi yok, hiçbir þey yapma
+
+                KitchenObjectSO kitchenObjectSO = playerKitchenObject.GetKitchenObjectSO();
+                
+                if (HasRecipeWithInput(kitchenObjectSO))
+                {
+                    // Player'ýn nesnesini counter'a taþý
+                    playerKitchenObject.SetClearCounter(this);
+                    cuttingProgress = 0;
+                    
+                    // Taþýndýktan SONRA recipe'yi bul
+                    CuttingRecipeSO recipe = GetCuttingRecipeSOWithInput(kitchenObjectSO);
+                    if (recipe != null)
+                    {
+                        OnProgressChanged?.Invoke(this, new OnProgressChangedEventArgs
+                        {
+                            progressNormalized = (float)cuttingProgress / recipe.cuttingProgressMax
+                        });
+                    }
+                }
             }
         }
         else
@@ -60,51 +77,67 @@ public class CuttingCounter : BaseCounter
             }
         }
     }
-   
 
     public override void InteractAlternate(Player player)
     {
         if (HasKitchenObject() && HasRecipeWithInput(GetKitchenObject().GetKitchenObjectSO()))
         {
             cuttingProgress++;
-
+            Oncut?.Invoke(this, EventArgs.Empty);
             KitchenObjectSO inputKitchenObjectSO = GetKitchenObject().GetKitchenObjectSO();
             CuttingRecipeSO cuttingRecipeSO = GetCuttingRecipeSOWithInput(inputKitchenObjectSO);
-            
-            if (cuttingProgress >= cuttingRecipeSO.cuttingProgressMax)
+
+            if (cuttingRecipeSO != null)
             {
-                KitchenObjectSO cutKitchenObjectSO = GetOutputForInput(inputKitchenObjectSO);
-                GetKitchenObject().DestorySelf();
-                KitchenObject.SpawnKitchenObject(cutKitchenObjectSO, this);
-                
-               
-                cuttingProgress = 0;
+                OnProgressChanged?.Invoke(this, new OnProgressChangedEventArgs
+                {
+                    progressNormalized = (float)cuttingProgress / cuttingRecipeSO.cuttingProgressMax
+                });
+
+                if (cuttingProgress >= cuttingRecipeSO.cuttingProgressMax)
+                {
+                    KitchenObjectSO cutKitchenObjectSO = GetOutputForInput(inputKitchenObjectSO);
+                    GetKitchenObject().DestorySelf();
+                    KitchenObject.SpawnKitchenObject(cutKitchenObjectSO, this);
+                    
+                    cuttingProgress = 0;
+                }
             }
         }
-        
     }
+
     private bool HasRecipeWithInput(KitchenObjectSO inputKitchenObjectSO)
     {
         CuttingRecipeSO cuttingRecipeSO = GetCuttingRecipeSOWithInput(inputKitchenObjectSO);
         return cuttingRecipeSO != null;
     }
+
     private KitchenObjectSO GetOutputForInput(KitchenObjectSO inputKitchenObjectSO)
     {
-
         CuttingRecipeSO cuttingRecipeSO = GetCuttingRecipeSOWithInput(inputKitchenObjectSO);
         if (cuttingRecipeSO != null)
         {
             return cuttingRecipeSO.output;
-        }else { 
+        }
+        else
+        { 
             return null;
         }
-       
     }
+
     private CuttingRecipeSO GetCuttingRecipeSOWithInput(KitchenObjectSO inputKitchenObjectSO)
     {
+        // Null check ekledim
+        if (cuttingRecipeSOArray == null || cuttingRecipeSOArray.Length == 0)
+        {
+            Debug.LogWarning($"CuttingCounter: cuttingRecipeSOArray null veya boþ!", gameObject);
+            return null;
+        }
+
         foreach (CuttingRecipeSO cuttingRecipeSO in cuttingRecipeSOArray)
         {
-            if (cuttingRecipeSO.input == inputKitchenObjectSO)
+            // Null check ekledim
+            if (cuttingRecipeSO != null && cuttingRecipeSO.input == inputKitchenObjectSO)
             {
                 return cuttingRecipeSO;
             }
