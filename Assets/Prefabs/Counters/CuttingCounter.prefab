@@ -223,6 +223,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0853754746820374b9d009f3e779db80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LootAtCamera
+  mode: 2
 --- !u!114 &7867478166818092757
 MonoBehaviour:
   m_ObjectHideFlags: 0
