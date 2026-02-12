@@ -75,8 +75,28 @@ public class KitchenObject : MonoBehaviour
     }
     public static KitchenObject SpawnKitchenObject(KitchenObjectSO kitchenObjectSO, IKitchenObjectParent kitchenObjectParent)
     {
+        if (kitchenObjectSO == null)
+        {
+            Debug.LogError("KitchenObject.SpawnKitchenObject: kitchenObjectSO null!");
+            return null;
+        }
+
+        if (kitchenObjectSO.prefab == null)
+        {
+            Debug.LogError($"KitchenObject.SpawnKitchenObject: kitchenObjectSO.prefab null! ({kitchenObjectSO.name})");
+            return null;
+        }
+
         Transform kitchenObjectTransform = Instantiate(kitchenObjectSO.prefab);
         KitchenObject newKitchenObject = kitchenObjectTransform.GetComponent<KitchenObject>();
+        
+        if (newKitchenObject == null)
+        {
+            Debug.LogError($"KitchenObject.SpawnKitchenObject: Instantiate edilen prefab'da KitchenObject component'i yok! ({kitchenObjectSO.name})");
+            Destroy(kitchenObjectTransform.gameObject);
+            return null;
+        }
+
         newKitchenObject.SetClearCounter(kitchenObjectParent);
         return newKitchenObject;
     }

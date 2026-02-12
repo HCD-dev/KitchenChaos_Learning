@@ -7,6 +7,9 @@
 /// </summary>
 public class ClearCounter : BaseCounter
 {
-    // ClearCounter'a özel özellikler ve metotlar buraya eklenebilir
-    // Şu an için BaseCounter'den miras aldığı metotlar yeterli
+    // BaseCounter'ın Interact davranışını açıkça devral
+    public override void Interact(Player player)
+    {
+        base.Interact(player);
+    }
 }

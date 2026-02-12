@@ -228,7 +228,24 @@ PrefabInstance:
       propertyPath: m_Name
       value: TrashCounter
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 8597273913801518596, guid: f750544d9c2a9494db999de4626e8143, type: 3}
+      propertyPath: m_Size.y
+      value: 2.1161363
+      objectReference: {fileID: 0}
+    - target: {fileID: 8597273913801518596, guid: f750544d9c2a9494db999de4626e8143, type: 3}
+      propertyPath: m_Center.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8597273913801518596, guid: f750544d9c2a9494db999de4626e8143, type: 3}
+      propertyPath: m_Center.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8597273913801518596, guid: f750544d9c2a9494db999de4626e8143, type: 3}
+      propertyPath: m_Center.z
+      value: -0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 420567725989331440, guid: f750544d9c2a9494db999de4626e8143, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 6978883103411915534, guid: f750544d9c2a9494db999de4626e8143, type: 3}
