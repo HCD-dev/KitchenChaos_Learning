@@ -68,7 +68,7 @@ public class KitchenObject : MonoBehaviour
     /// </summary>
     public IKitchenObjectParent GetClearCounter() => kitchenObjectParent;
 
-    internal void DestorySelf()
+    public void DestorySelf()
     {
         kitchenObjectParent.ClearKitchenObject();
         Destroy(gameObject);
@@ -80,4 +80,4 @@ public class KitchenObject : MonoBehaviour
         newKitchenObject.SetClearCounter(kitchenObjectParent);
         return newKitchenObject;
     }
-}   
+}

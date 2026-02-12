@@ -32,7 +32,6 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     [SerializeField] private float rotationSpeed = 10f;     
     [SerializeField] private GameInput gameInput;
     [SerializeField] private float interactionDistance = 2f;
-    [SerializeField] private float detectionRadius = 0.5f;
     [SerializeField] private LayerMask counterLayerMask;
     [SerializeField] private Transform KitchenObjectHoldPoint;
 
@@ -110,6 +109,13 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     private void HandleMovement()
     {
+        // Null check ekleyin
+        if (gameInput == null)
+        {
+            Debug.LogError("GameInput referansı null!");
+            return;
+        }
+
         Vector2 inputVector = gameInput.GetMovementVectorNormalized();
         Vector3 moveDir = new Vector3(inputVector.x, 0f, inputVector.y);
 

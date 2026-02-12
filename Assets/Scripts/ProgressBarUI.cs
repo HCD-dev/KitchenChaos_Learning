@@ -4,39 +4,51 @@ using UnityEngine.UI;
 
 public class ProgressBarUI : MonoBehaviour
 {
-    [SerializeField] private CuttingCounter cuttingCounter;
+    [SerializeField] private GameObject hasProgresGameObject; 
     [SerializeField] private Image barImage;
-    
-    
+
+    private IHasProgress hasProgress;
     private void Start()
     {
-        // Null check ekledim
-        if (cuttingCounter == null)
+        hasProgress = hasProgresGameObject.GetComponent<IHasProgress>();
+        
+        if (hasProgress == null)
         {
-            Debug.LogError($"ProgressBarUI: cuttingCounter Inspector'da atanmamýþ!", gameObject);
+            Debug.LogError($"ProgressBarUI: hasProgresGameObject Inspector'da atanmamýþ veya IHasProgress component'i yok!", gameObject);
+            return;
+        }   
+
+
+        // Null check ekledim
+        if (hasProgress == null)
+        {
+            Debug.LogError($"ProgressBarUI: hasProgress Inspector'da atanmamýþ!", gameObject);
             return;
         }
 
-        cuttingCounter.OnProgressChanged += CuttingCounter_OnProgressChanged;
+        hasProgress.OnProgressChanged += HasProgress_OnProgressChanged;
+
 
         Hide();    
     }
 
     private void OnDestroy()
     {
-        if (cuttingCounter != null)
+        if (hasProgress != null)
         {
-            cuttingCounter.OnProgressChanged -= CuttingCounter_OnProgressChanged;
+            hasProgress.OnProgressChanged -= HasProgress_OnProgressChanged;
         }
     }
 
-    private void CuttingCounter_OnProgressChanged(object sender, CuttingCounter.OnProgressChangedEventArgs e)
+    private void HasProgress_OnProgressChanged(object sender, IHasProgress.OnProgressChangedEventArgs e)
     {
         if (barImage != null)
         {
             barImage.fillAmount = e.progressNormalized;
         }
-        if (e.progressNormalized == 0f || e.progressNormalized == 1f)
+        
+        // Progress 0 ise gizle, aksi halde göster
+        if (e.progressNormalized <= 0f)
         {
             Hide();
         }

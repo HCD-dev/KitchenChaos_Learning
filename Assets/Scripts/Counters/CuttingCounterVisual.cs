@@ -13,7 +13,7 @@ public class CuttingCounterVisual : MonoBehaviour
     }
     private void Start()
     {
-       cuttingCounter.Oncut += CuttingCounter_OnCut;
+        cuttingCounter.OnStageChanged += CuttingCounter_OnCut;
     }
 
     private void CuttingCounter_OnCut(object sender, EventArgs e)

@@ -2,15 +2,10 @@ using UnityEngine;
 using System;
 
 
-public class CuttingCounter : BaseCounter
+public class CuttingCounter : BaseCounter, IHasProgress
 {
-
-    public event EventHandler<OnProgressChangedEventArgs> OnProgressChanged;
-    public class OnProgressChangedEventArgs : EventArgs
-    {
-        public float progressNormalized;
-    }
-    public event EventHandler Oncut;
+    public event EventHandler<IHasProgress.OnProgressChangedEventArgs> OnProgressChanged;
+    public event EventHandler OnStageChanged;
 
     // ========== ÝNCELEYÝCÝ AYARLARI ==========
     [SerializeField] private CuttingRecipeSO[] cuttingRecipeSOArray;
@@ -56,7 +51,7 @@ public class CuttingCounter : BaseCounter
                     CuttingRecipeSO recipe = GetCuttingRecipeSOWithInput(kitchenObjectSO);
                     if (recipe != null)
                     {
-                        OnProgressChanged?.Invoke(this, new OnProgressChangedEventArgs
+                        OnProgressChanged?.Invoke(this, new IHasProgress.OnProgressChangedEventArgs
                         {
                             progressNormalized = (float)cuttingProgress / recipe.cuttingProgressMax
                         });
@@ -74,6 +69,11 @@ public class CuttingCounter : BaseCounter
             {
                 // Oyuncunun elinde mutfak objesi yok, tezgah dolu, mutfak objesini oyuncuya ver
                 GetKitchenObject().SetClearCounter(player);
+                // Nesne alýndýðýnda progress'i sýfýrla
+                OnProgressChanged?.Invoke(this, new IHasProgress.OnProgressChangedEventArgs
+                {
+                    progressNormalized = 0f
+                });
             }
         }
     }
@@ -83,13 +83,13 @@ public class CuttingCounter : BaseCounter
         if (HasKitchenObject() && HasRecipeWithInput(GetKitchenObject().GetKitchenObjectSO()))
         {
             cuttingProgress++;
-            Oncut?.Invoke(this, EventArgs.Empty);
+            OnStageChanged?.Invoke(this, EventArgs.Empty);
             KitchenObjectSO inputKitchenObjectSO = GetKitchenObject().GetKitchenObjectSO();
             CuttingRecipeSO cuttingRecipeSO = GetCuttingRecipeSOWithInput(inputKitchenObjectSO);
 
             if (cuttingRecipeSO != null)
             {
-                OnProgressChanged?.Invoke(this, new OnProgressChangedEventArgs
+                OnProgressChanged?.Invoke(this, new IHasProgress.OnProgressChangedEventArgs
                 {
                     progressNormalized = (float)cuttingProgress / cuttingRecipeSO.cuttingProgressMax
                 });
@@ -101,6 +101,11 @@ public class CuttingCounter : BaseCounter
                     KitchenObject.SpawnKitchenObject(cutKitchenObjectSO, this);
                     
                     cuttingProgress = 0;
+                    // Kesme tamamlandýktan sonra progress'i sýfýrla
+                    OnProgressChanged?.Invoke(this, new IHasProgress.OnProgressChangedEventArgs
+                    {
+                        progressNormalized = 0f
+                    });
                 }
             }
         }
