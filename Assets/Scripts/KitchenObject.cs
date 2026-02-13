@@ -23,7 +23,7 @@ public class KitchenObject : MonoBehaviour
     /// Eski parent'ı temizler, hedef parent'taki mevcut nesneyi imha eder.
     /// </summary>
     /// <param name="newParent">Taşınacak hedef parent (null = parent'dan çıkar)</param>
-    public void SetClearCounter(IKitchenObjectParent newParent)
+    public void SetKitchenObjectParent(IKitchenObjectParent newParent)
     {
         // 🔑 ADIM 1: Eski parent'dan kendimizi çıkar
         if (kitchenObjectParent != null)
@@ -68,11 +68,25 @@ public class KitchenObject : MonoBehaviour
     /// </summary>
     public IKitchenObjectParent GetClearCounter() => kitchenObjectParent;
 
-    public void DestorySelf()
+    public void DestroySelf()
     {
-        kitchenObjectParent.ClearKitchenObject();
         Destroy(gameObject);
     }
+
+    public bool TryGetPlate(out PlateKitchenObject plateKitchenObject)
+    {
+        if (this is PlateKitchenObject)
+        {
+            plateKitchenObject = this as PlateKitchenObject;
+            return true;
+        }
+        else
+        {
+            plateKitchenObject = null;
+            return false;
+        }
+    }
+
     public static KitchenObject SpawnKitchenObject(KitchenObjectSO kitchenObjectSO, IKitchenObjectParent kitchenObjectParent)
     {
         if (kitchenObjectSO == null)
@@ -97,7 +111,7 @@ public class KitchenObject : MonoBehaviour
             return null;
         }
 
-        newKitchenObject.SetClearCounter(kitchenObjectParent);
+        newKitchenObject.SetKitchenObjectParent(kitchenObjectParent);
         return newKitchenObject;
     }
 }

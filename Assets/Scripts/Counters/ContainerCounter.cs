@@ -45,7 +45,7 @@ public class ContainerCounter : BaseCounter
         {
             // Counter'da nesne varsa (bu durumda olmaması gerekir, ama güvenlik için)
             // Counter'daki nesneyi player'a ver (varsa)
-            GetKitchenObject().SetClearCounter(player);
+            GetKitchenObject().SetKitchenObjectParent(player);
         }
     }
 }

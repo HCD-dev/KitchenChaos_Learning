@@ -46,7 +46,7 @@ public abstract class BaseCounter : MonoBehaviour, IKitchenObjectParent
                 // Player'daki nesneyi bu counter'a koy
                 KitchenObject playerObject = player.GetKitchenObject();
                 player.ClearKitchenObject();
-                playerObject.SetClearCounter(this);
+                playerObject.SetKitchenObjectParent(this);
             }
             // Player'da nesne yok ve counter'da da yok - Yeni nesne oluþturma!
         }
@@ -61,7 +61,7 @@ public abstract class BaseCounter : MonoBehaviour, IKitchenObjectParent
 
             // Counter'daki nesneyi player'a ver
             KitchenObject objectToGive = kitchenObject;
-            objectToGive.SetClearCounter(player);
+            objectToGive.SetKitchenObjectParent(player);
 
             objectToGive.transform.parent = player.GetKitchenObjectFollowTransform();
             objectToGive.transform.localPosition = Vector3.zero;

@@ -62,7 +62,7 @@ public class StoveCounter : BaseCounter , IHasProgress
 
                 if (fryingTimer > fryingRecipeSO.FryingTimerMax)
                 {
-                    GetKitchenObject().DestorySelf();
+                    GetKitchenObject().DestroySelf();
                     KitchenObject.SpawnKitchenObject(fryingRecipeSO.output, this);
                     fryingTimer = 0f;
                     fryingRecipeSO = null;
@@ -91,7 +91,7 @@ public class StoveCounter : BaseCounter , IHasProgress
 
                 if (fryingTimer > burnedRecipeSO.BurnedTimerMax)
                 {
-                    GetKitchenObject().DestorySelf();
+                    GetKitchenObject().DestroySelf();
                     KitchenObject.SpawnKitchenObject(burnedRecipeSO.output, this);
                     fryingTimer = 0f;
                     burnedRecipeSO = null;
@@ -131,7 +131,7 @@ public class StoveCounter : BaseCounter , IHasProgress
                 KitchenObjectSO kitchenObjectSO = player.GetKitchenObject().GetKitchenObjectSO();
                 if (HasRecipeWithInput(kitchenObjectSO))
                 {
-                    player.GetKitchenObject().SetClearCounter(this);
+                    player.GetKitchenObject().SetKitchenObjectParent(this);
                     fryingRecipeSO = GetFryingRecipeSOWithInput(kitchenObjectSO);
                     fryingTimer = 0f;
                     state = State.Frying;
@@ -142,9 +142,28 @@ public class StoveCounter : BaseCounter , IHasProgress
         }
         else
         {
-            if (!player.HasKitchenObject())
+            if (player.HasKitchenObject())
             {
-                GetKitchenObject().SetClearCounter(player);
+                // Oyuncunun elinde mutfak objesi var, tezgah dolu
+                if (player.GetKitchenObject().TryGetPlate(out PlateKitchenObject plateKitchenObject))
+                {
+                    // Player plate tutuyor, tezgahtaki piþmiþ malzemeyi plate'ye eklemeye çalýþ
+                    if (plateKitchenObject.TryAddIngredient(GetKitchenObject().GetKitchenObjectSO()))
+                    { 
+                        GetKitchenObject().DestroySelf();
+                        state = State.Idle;
+                        fryingTimer = 0f;
+                        fryingRecipeSO = null;
+                        burnedRecipeSO = null;
+                        OnStateChanged?.Invoke(this, new OnStateChangedEventArgs { state = state });
+                        OnProgressChanged?.Invoke(this, new IHasProgress.OnProgressChangedEventArgs { progressNormalized = 0f });
+                    }
+                }
+            }
+            else
+            {
+                // Oyuncunun eli boþsa, tezgahtaki nesneyi al
+                GetKitchenObject().SetKitchenObjectParent(player);
                 state = State.Idle;
                 fryingTimer = 0f;
                 fryingRecipeSO = null;

@@ -27,11 +27,11 @@ public class PlatesCounter : BaseCounter
         {
             spawnPlateTimer = 0f;
 
-            
+            if (platesSpawnedAmount < platesSpawnedAmountMax)
+            {
                 platesSpawnedAmount++;
-
                 OnPlateSpawned?.Invoke(this, EventArgs.Empty);
-            
+            }
         }
     }
 
