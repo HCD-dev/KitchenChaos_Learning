@@ -6,6 +6,8 @@ public class DeliveryManager : MonoBehaviour
 {
 
 
+    public event EventHandler OnRecipeSpawned;
+    public event EventHandler OnRecipeCompleted;
     public static DeliveryManager Instance { get; private set; }
     [SerializeField] private RecipeListSO recipeListSO;
 
@@ -45,7 +47,8 @@ public class DeliveryManager : MonoBehaviour
             {
                 RecipeSO waitingrecipeSO = recipeListSO.recipeSOList[UnityEngine.Random.Range(0, recipeListSO.recipeSOList.Count)];
                 waitingrecipeSOList.Add(waitingrecipeSO);
-                Debug.Log("Spawned Recipe: " + waitingrecipeSO.recipeName);
+                OnRecipeSpawned?.Invoke(this, EventArgs.Empty);
+                
             }
         }
     }
@@ -99,7 +102,7 @@ public class DeliveryManager : MonoBehaviour
             // 3. Eðer tüm malzemeler eþleþirse, teslim baþarýlý
             if (plateMatchesRecipe)
             {
-                Debug.Log("Correct Delivery: " + waitingrecipeSO.recipeName);
+                OnRecipeCompleted?.Invoke(this, EventArgs.Empty);
                 waitingrecipeSOList.RemoveAt(i);
                 return;
             }
@@ -107,6 +110,10 @@ public class DeliveryManager : MonoBehaviour
 
         // Hiçbir recipe ile eþleþmedi
         Debug.Log("Incorrect Delivery");
+    }
+    public List<RecipeSO> GetWaitingRecipeSOList()
+    {
+        return waitingrecipeSOList;
     }
 
 
