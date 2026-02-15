@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -6,6 +7,7 @@ using UnityEngine;
 /// </summary>
 public abstract class BaseCounter : MonoBehaviour, IKitchenObjectParent
 {
+    public static event EventHandler OnAnyObjectPlacedHere;
     // ========== ORTAK ALANLAR ==========
     // Inspector'da atanacak: Bu counter'a eklenecek nesnenin ScriptableObject verisi
     [SerializeField] protected KitchenObjectSO kitchenObjectSO;
@@ -19,7 +21,14 @@ public abstract class BaseCounter : MonoBehaviour, IKitchenObjectParent
     // ========== INTERFACE IMPLEMENTATION ==========
     public virtual Transform GetKitchenObjectFollowTransform() => CounterTopPoint;
 
-    public virtual void SetKitchenObject(KitchenObject kitchenObject) => this.kitchenObject = kitchenObject;
+    public virtual void SetKitchenObject(KitchenObject kitchenObject)
+    {
+        this.kitchenObject = kitchenObject;
+        if(kitchenObject != null)
+        {
+            OnAnyObjectPlacedHere?.Invoke(this, EventArgs.Empty);
+        }
+    }
 
     public virtual KitchenObject GetKitchenObject() => kitchenObject;
 

@@ -10,6 +10,8 @@ using System;
 /// </summary>
 public class Player : MonoBehaviour, IKitchenObjectParent
 {
+
+
     // ========== CONSTANTS ==========
     private const float PLAYER_RADIUS = 0.7f;
     private const float PLAYER_HEIGHT = 2f;
@@ -20,6 +22,8 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     public static Player Instance { get; private set; }
 
     // ========== EVENTLER ==========
+    public event EventHandler OnPickedSomething;
+    
     public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged;
 
     public class OnSelectedCounterChangedEventArgs : EventArgs
@@ -249,6 +253,10 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     public void SetKitchenObject(KitchenObject kitchenObject)
     {
         this.kitchenObject = kitchenObject;
+        if (kitchenObject != null)
+        {
+            OnPickedSomething?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     public KitchenObject GetKitchenObject()

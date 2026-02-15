@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentVersion: 1.01
   subtype: kitchenchaos
-  lastShownTimestamp: 1771074586
+  lastShownTimestamp: 1771161116
   lastUpdateResponse:
     version: 1.01
     versionUrl: https://unitycodemonkey.com
-  checkedLastUpdateTimestamp: 1771074586
+  checkedLastUpdateTimestamp: 1771161116
   lastQOTDResponse:
     questionId: 272
     questionText: Which namespace do we need to use File.WriteAllText()?
@@ -27,18 +27,18 @@ MonoBehaviour:
     answerC: using System.IO;
     answerD: using UnityEngine.UI;
     answerE: 
-  lastQotdTimestamp: 1771074586
+  lastQotdTimestamp: 1771161116
   lastDynamicHeaderResponse:
     topImageUrl: https://codemonkeyexternal.blob.core.windows.net/external/Misc/gameDevReport_2.png
     topText: Stay up to date with the latest in Game Dev straight to your inbox!
     topLink: gamedevreport
     bottomText: My 10+ Years of C# Knowledge in 1 Course!
     bottomLink: csharpcourse
-  lastDynamicHeaderTimestamp: 1771074586
+  lastDynamicHeaderTimestamp: 1771161116
   websiteLatestMessage:
     text: <a href="https://cmonkey.co/freecourses">Check out all my FREE courses!
       Click here!</a>
-  websiteLatestMessageTimestamp: 1771074586
+  websiteLatestMessageTimestamp: 1771161116
   websiteLatestVideos:
     videos:
     - youTubeId: Vb5BZu7TOIk
@@ -49,4 +49,4 @@ MonoBehaviour:
       title: 'Productivity Tip: DON''T Finish Your Tasks!'
     - youTubeId: B2G1ZTKzJSM
       title: BEST NEW Visual Assets to INSPIRE YOU! (JANUARY 2026)
-  websiteLatestVideosTimestamp: 1771074586
+  websiteLatestVideosTimestamp: 1771161116

@@ -8,6 +8,8 @@ public class DeliveryManager : MonoBehaviour
 
     public event EventHandler OnRecipeSpawned;
     public event EventHandler OnRecipeCompleted;
+    public event EventHandler OnRecipeFailed;
+    public event EventHandler OnRecipeSuccess;
     public static DeliveryManager Instance { get; private set; }
     [SerializeField] private RecipeListSO recipeListSO;
 
@@ -103,12 +105,15 @@ public class DeliveryManager : MonoBehaviour
             if (plateMatchesRecipe)
             {
                 OnRecipeCompleted?.Invoke(this, EventArgs.Empty);
+                OnRecipeSuccess?.Invoke(this, EventArgs.Empty);
                 waitingrecipeSOList.RemoveAt(i);
+                Debug.Log("Recipe Delivered: " + waitingrecipeSO.recipeName);
                 return;
             }
         }
 
         // Hiçbir recipe ile eþleþmedi
+        OnRecipeFailed?.Invoke(this, EventArgs.Empty);
         Debug.Log("Incorrect Delivery");
     }
     public List<RecipeSO> GetWaitingRecipeSOList()
