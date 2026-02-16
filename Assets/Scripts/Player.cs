@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 
 /// <summary>
@@ -18,7 +16,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     private const float FORWARD_CHECK_THRESHOLD = 0.7f; // ~45 derece
     private const float MOVEMENT_THRESHOLD = 0.5f;
 
-    // ========== SİNGLETON PATTERN ==========
+    
     public static Player Instance { get; private set; }
 
     // ========== EVENTLER ==========
@@ -55,6 +53,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
             return;
         }
         Instance = this;
+       
     }
 
     void Start()
@@ -72,12 +71,20 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     private void GameInput_OnInteractAction(object sender, System.EventArgs e)
     {
+        if (!KitchemGameManager.Instance.IsGamePlaying())
+        {
+            return;
+        }
         HandleCounterInteraction((counter) => counter.Interact(this));
     }
 
     private void GameInput_OnInteractAlternateAction(object sender, System.EventArgs e)
     {
-        HandleCounterInteraction((counter) => counter.InteractAlternate(this));
+        if (!KitchemGameManager.Instance.IsGamePlaying())
+        {
+            return;
+        }
+            HandleCounterInteraction((counter) => counter.InteractAlternate(this));
     }
 
     private void HandleCounterInteraction(System.Action<BaseCounter> interactionAction)
