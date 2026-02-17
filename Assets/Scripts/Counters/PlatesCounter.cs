@@ -5,20 +5,15 @@ using UnityEngine;
 
 public class PlatesCounter : BaseCounter
 {
-
-
     public event EventHandler OnPlateSpawned;
     public event EventHandler OnPlateRemoved;
 
-
     [SerializeField] private KitchenObjectSO plateKitchenObjectSO;
-
 
     private float spawnPlateTimer;
     private float spawnPlateTimerMax = 4f;
     private int platesSpawnedAmount;
     private int platesSpawnedAmountMax = 4;
-
 
     private void Update()
     {
@@ -52,4 +47,9 @@ public class PlatesCounter : BaseCounter
         }
     }
 
+    public override void InteractAlternate(Player player)
+    {
+        // PlatesCounter'a obje koymayı engelle
+        // Boş kalacak şekilde bırak
+    }
 }

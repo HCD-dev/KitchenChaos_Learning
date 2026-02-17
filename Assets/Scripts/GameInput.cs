@@ -2,18 +2,23 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.Xml.Serialization;
 
 public class GameInput : MonoBehaviour
 {
+    public static GameInput Instance { get; private set; }
+
     // ========== EVENTLER ==========
     public event EventHandler OnInteractAction;
     public event EventHandler OnInteractAlternateAction;
+    public event EventHandler OnPauseAction;
 
     // ========== INPUT SYSTEM REFERANSI ==========
     private PlayerInputAction PlayerInputActions;
 
     private void Awake()
     {
+        Instance = this;
         try
         {
             // Input System sýnýfýný oluþtur
@@ -27,11 +32,18 @@ public class GameInput : MonoBehaviour
 
             // F tuþu callback'i (InteractAlternate)
             PlayerInputActions.Player.InteractAlternate.performed += InteractAlternate_performed;
+
+            // Escape tuþu callback'i (Pause)
+            PlayerInputActions.Player.Pause.performed += Pause_performed;
         }
         catch (System.Exception ex)
         {
             Debug.LogError($"GameInput Awake hatasý: {ex.Message}");
         }
+    }
+    private void Pause_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        OnPauseAction?.Invoke(this, EventArgs.Empty);
     }
 
     private void Interact_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
