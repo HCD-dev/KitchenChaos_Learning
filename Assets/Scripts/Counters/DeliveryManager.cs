@@ -17,6 +17,7 @@ public class DeliveryManager : MonoBehaviour
     private float spawnRecipeTimer;
     private float spawnRecipeTimerMax = 4f;
     private int waitingRecipeSOListMax = 4;
+    private int successfulRecipesAmount ;
 
     private void Awake()
     {
@@ -104,6 +105,7 @@ public class DeliveryManager : MonoBehaviour
             // 3. Eðer tüm malzemeler eþleþirse, teslim baþarýlý
             if (plateMatchesRecipe)
             {
+                successfulRecipesAmount++;
                 OnRecipeCompleted?.Invoke(this, EventArgs.Empty);
                 OnRecipeSuccess?.Invoke(this, EventArgs.Empty);
                 waitingrecipeSOList.RemoveAt(i);
@@ -119,6 +121,10 @@ public class DeliveryManager : MonoBehaviour
     public List<RecipeSO> GetWaitingRecipeSOList()
     {
         return waitingrecipeSOList;
+    }
+    public int GetSuccessfulRecipesAmount()
+    {
+        return successfulRecipesAmount;
     }
 
 
