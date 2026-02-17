@@ -137,7 +137,7 @@ GameObject:
   - component: {fileID: 44651048}
   - component: {fileID: 44651047}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: Floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2788,6 +2788,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1048435514}
+  - component: {fileID: 1048435515}
   m_Layer: 5
   m_Name: GamePlayingCloakUI
   m_TagString: Untagged
@@ -2816,6 +2817,19 @@ RectTransform:
   m_AnchoredPosition: {x: -100, y: -94}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 1, y: 1}
+--- !u!114 &1048435515
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048435513}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 849cc19599a519143a3aa0d462cc6f5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GamePlayingCloakUI
+  timerImage: {fileID: 2043439917}
 --- !u!4 &1058584178 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7086623448140431206, guid: a486c6e6a3499bc48b2146b5dcbb73d9, type: 3}
@@ -3935,7 +3949,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1560480165}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1691839e11774fc4b9a269e03762f226, type: 3}
+  m_Script: {fileID: 11500000, guid: edb12589d34c94b498520408f94c8a26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KitchemGameManager
 --- !u!1 &1577035452
@@ -5135,9 +5149,9 @@ SceneRoots:
   - {fileID: 1608113162}
   - {fileID: 410087041}
   - {fileID: 832575519}
+  - {fileID: 44651050}
   - {fileID: 1608918544}
   - {fileID: 48616796}
-  - {fileID: 44651050}
   - {fileID: 1270051964}
   - {fileID: 553310781}
   - {fileID: 1444159932}

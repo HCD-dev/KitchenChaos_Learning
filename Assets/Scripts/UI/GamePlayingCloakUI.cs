@@ -10,9 +10,9 @@ public class GamePlayingCloakUI : MonoBehaviour
 
     private void Update()
     {
-        if (KitchemGameManager.Instance == null) return;
+        if (KitchenGameManager.Instance == null) return;
         
-        timerImage.fillAmount = KitchemGameManager.Instance.GetGamePlayingTimerNormalized();
+        timerImage.fillAmount = KitchenGameManager.Instance.GetGamePlayingTimerNormalized();
     }
 }
 

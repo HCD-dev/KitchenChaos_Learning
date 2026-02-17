@@ -8,35 +8,46 @@ public class GameOverUI : MonoBehaviour
 
     private void Start()
     {
-        KitchemGameManager.Instance.OnStateChanged += KitchemGameManager_OnStateChanged;
-        //Hide();
+        if (KitchenGameManager.Instance != null)
+        {
+            KitchenGameManager.Instance.OnStateChanged += KitchenGameManager_OnStateChanged;
+        }
+        else
+        {
+            Debug.LogError("GameOverUI: KitchenGameManager.Instance is null!");
+        }
+        Hide();
     }
 
-    private void KitchemGameManager_OnStateChanged(object sender, EventArgs e)
+    private void KitchenGameManager_OnStateChanged(object sender, EventArgs e)
     {
-        if (KitchemGameManager.Instance.IsGameOver())
+        if (KitchenGameManager.Instance != null && KitchenGameManager.Instance.IsGameOver())
         {
             Show();
-            recipesDeliveredText.text = DeliveryManager.Instance.GetSuccessfulRecipesAmount().ToString();
+            if (DeliveryManager.Instance != null)
+            {
+                recipesDeliveredText.text = DeliveryManager.Instance.GetSuccessfulRecipesAmount().ToString();
+            }
         }
         else
         {
             Hide();
         }
     }
+
     private void Update()
     {
         
 
     }
+
     private void Show()
     {
         gameObject.SetActive(true);
     }
+
     private void Hide()
     {
         gameObject.SetActive(false);
     }
-
-
 }

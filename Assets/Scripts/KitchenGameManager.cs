@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class KitchemGameManager : MonoBehaviour
+public class KitchenGameManager : MonoBehaviour
 {
     public event EventHandler OnStateChanged;
     private enum State
@@ -18,7 +18,7 @@ public class KitchemGameManager : MonoBehaviour
     private float gamePlayingTimer;
     private float gamePlayingTimerMax = 30f;
 
-    public static KitchemGameManager Instance { get; private set; }
+    public static KitchenGameManager Instance { get; private set; }
 
     private void Awake()
     {
