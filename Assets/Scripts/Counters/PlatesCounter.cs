@@ -45,6 +45,17 @@ public class PlatesCounter : BaseCounter
                 OnPlateRemoved?.Invoke(this, EventArgs.Empty);
             }
         }
+        else
+        {
+            // Player already has a kitchen object
+            if (player.GetKitchenObject().GetKitchenObjectSO() == plateKitchenObjectSO && platesSpawnedAmount < platesSpawnedAmountMax)
+            {
+                // Player is holding a plate and counter is not full
+                platesSpawnedAmount++;
+                player.GetKitchenObject().DestroySelf();
+                OnPlateSpawned?.Invoke(this, EventArgs.Empty);
+            }
+        }
     }
 
     public override void InteractAlternate(Player player)
