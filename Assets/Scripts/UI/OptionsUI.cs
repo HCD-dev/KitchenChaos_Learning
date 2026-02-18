@@ -17,9 +17,6 @@ public class OptionsUI : MonoBehaviour
     [SerializeField] private Button interactButton;
     [SerializeField] private Button interactAlternateButton;
     [SerializeField] private Button pauseButton;
-    [SerializeField] private Button gamepadInteractButton;
-    [SerializeField] private Button gamepadInteractAlternateButton;
-    [SerializeField] private Button gamepadPauseButton;
     [SerializeField] private TextMeshProUGUI soundEffectsText;
     [SerializeField] private TextMeshProUGUI musicText;
     [SerializeField] private TextMeshProUGUI moveUpText;
@@ -29,9 +26,6 @@ public class OptionsUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI interactText;
     [SerializeField] private TextMeshProUGUI interactAlternateText;
     [SerializeField] private TextMeshProUGUI pauseText;
-    [SerializeField] private TextMeshProUGUI gamepadInteractText;
-    [SerializeField] private TextMeshProUGUI gamepadInteractAlternateText;
-    [SerializeField] private TextMeshProUGUI gamepadPauseText;
     [SerializeField] private Transform pressToRebindKeyTransform;
 
     private bool isOpen = false;

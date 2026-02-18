@@ -27,10 +27,7 @@ public class GameInput : MonoBehaviour
         Move_Right,
         Interact,
         InteractAlternate,
-        Pause,
-        Gamepad_Interact,
-        Gamepad_InteractAlternate,
-        Gamepad_Pause
+        Pause
     }
     private void Awake()
     {
